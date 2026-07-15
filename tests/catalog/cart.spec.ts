@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import dotenv from 'dotenv';
 import path from 'path';
-dotenv.config({ path: path.resolve('C:\\Users\\Beno\\Desktop\\QA\\vja-tests\\.env') });
+dotenv.config({ path: path.resolve('.env') });
 
 test.describe('Cart', () => {
   test.beforeEach(async ({ page }) => {
@@ -12,10 +12,50 @@ test.describe('Cart', () => {
     await page.goto('/products');
   });
 
+  test('[C56] Add to Cart Price Summary Calculation', async ({ page }) => {
+    //Arrange
+    await expect(page.getByTestId('cart-link')).toBeVisible();
+    await expect(page.getByTestId('product-card').first()).toBeVisible();
+    await expect(page.getByTestId('add-to-cart-btn').first()).toBeVisible();
+
+    await expect(page.getByTestId('product-card').nth(1)).toBeVisible();
+    await expect(page.getByTestId('add-to-cart-btn').nth(1)).toBeVisible();
+
+    await expect(page.getByTestId('product-card').nth(2)).toBeVisible();
+    await expect(page.getByTestId('add-to-cart-btn').nth(2)).toBeVisible();
+
+    //Act
+    await page.getByTestId('add-to-cart-btn').first().click();
+    await page.getByTestId('add-to-cart-btn').nth(1).click();
+    await page.getByTestId('add-to-cart-btn').nth(1).click();
+    await page.getByTestId('add-to-cart-btn').nth(2).click();
+    await page.goto('/cart');
+    const lineTexts = await page.getByText('· Qty').allTextContents();
+
+    const expectedSubtotal = lineTexts.reduce((sum, text) => {
+        const [priceStr, qtyStr] = text.split('·');
+        const price = parseFloat(priceStr.replace('$', '').trim());
+        const qty = parseInt(qtyStr.replace('Qty', '').trim(), 10);
+        return sum + price * qty;
+    }, 0);
+
+    const subtotalText = await page.getByText('Subtotal$').textContent();
+    const subtotal = parseFloat((subtotalText || '').replace('Subtotal$', ''));
+
+    //Assert
+    expect(subtotal).toEqual(expectedSubtotal);
+    
+  });
 
 
 
   test.afterEach(async ({ page }) => {
+    await page.goto('/cart');
+    let cartItemsCount = await page.getByTestId('remove-cart-item-btn').count();
+    while (cartItemsCount > 0) {
+      await page.getByTestId('remove-cart-item-btn').first().click();
+      cartItemsCount--;
+    }
     await expect(page.getByTestId('logout-btn')).toBeVisible();
     await page.getByTestId('logout-btn').click();
   });
