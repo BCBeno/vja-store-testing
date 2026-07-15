@@ -9,6 +9,14 @@ test.describe('Cart', () => {
     await page.getByTestId('login-email-input').fill(process.env.EMAIL_ACCOUNT || '');
     await page.getByTestId('login-password-input').fill(process.env.EMAIL_PASSWORD || '');
     await page.getByTestId('login-btn').click();
+    
+    await page.goto('/cart');
+    let cartItemsCount = await page.getByTestId('remove-cart-item-btn').count();
+    while (cartItemsCount > 0) {
+      await page.getByTestId('remove-cart-item-btn').first().click();
+      cartItemsCount--;
+    }
+    
     await page.goto('/products');
   });
 
@@ -46,6 +54,19 @@ test.describe('Cart', () => {
     expect(subtotal).toEqual(expectedSubtotal);
     
   });
+
+  test('[C57] Checkout With a Non-Empty Cart', async ({ page }) => {
+
+        //Act
+        await page.getByTestId('product-card').first().click();
+        await page.getByTestId('add-to-cart-btn').first().click();
+        await page.getByTestId('cart-link').click();
+        await page.getByTestId('checkout-btn').click();
+
+        //Assert
+        await expect(page.getByTestId('order-success-message')).toBeVisible();
+
+    });
 
 
 
