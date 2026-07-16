@@ -1,6 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 
-export const NAVBAR_LOCATORS = (page: Page) => ({
+export const navbarLocators = (page: Page) => ({
     homeLink: (): Locator => page.getByRole('link', { name: 'VJA Store' }),
     productsLink: (): Locator => page.getByRole('banner').getByRole('link', { name: 'Products' }),
     cartLink: (): Locator => page.getByTestId('cart-link'),

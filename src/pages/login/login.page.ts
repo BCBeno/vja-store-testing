@@ -1,20 +1,12 @@
-import { LOGIN_LOCATORS } from './login.locators';
+import { loginLocators } from './login.locators';
 import { Page, Locator, expect } from '@playwright/test';
 
 export class LoginPage {
+    readonly loginLocators;
     private readonly page: Page;
-    readonly emailInput: Locator;
-    readonly passwordInput: Locator;
-    readonly loginButton: Locator;
-    readonly errorMessage: Locator;
-
     constructor(page: Page) {
+        this.loginLocators = loginLocators(page);
         this.page = page;
-        const locators = LOGIN_LOCATORS(page);
-        this.emailInput = locators.emailInput();
-        this.passwordInput = locators.passwordInput();
-        this.loginButton = locators.loginButton();
-        this.errorMessage = locators.errorMessage();
     }
 
     async goto() {
@@ -22,9 +14,9 @@ export class LoginPage {
     }
 
     async login(email: string, password: string) {
-        await this.emailInput.fill(email);
-        await this.passwordInput.fill(password);
-        await this.loginButton.click();
+        await this.loginLocators.emailInput().fill(email);
+        await this.loginLocators.passwordInput().fill(password);
+        await this.loginLocators.loginButton().click();
     }
 
     

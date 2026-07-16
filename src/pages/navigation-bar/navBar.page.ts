@@ -1,25 +1,14 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { NAVBAR_LOCATORS } from './navBar.locators';
+import { navbarLocators } from './navBar.locators';
 
 
 export class NavBarPage {
     private readonly page: Page;
-    readonly homeLink: Locator;
-    readonly productsLink: Locator;
-    readonly cartLink: Locator;
-    readonly loginLink: Locator;
-    readonly registerLink: Locator;
-    readonly logoutLink: Locator;
+    readonly navbarLocators;
 
     constructor(page: Page) {
         this.page = page;
-        const locators = NAVBAR_LOCATORS(page);
-        this.homeLink = locators.homeLink();
-        this.productsLink = locators.productsLink();
-        this.cartLink = locators.cartLink();
-        this.loginLink = locators.loginLink();
-        this.registerLink = locators.registerLink();
-        this.logoutLink = locators.logoutLink();
+        this.navbarLocators = navbarLocators(page);
     }
 
     async goto() {
@@ -27,24 +16,24 @@ export class NavBarPage {
     }
 
     async login() {
-        await this.loginLink.click();
+        await this.navbarLocators.loginLink().click();
     }
 
     async logout() {
-        await this.logoutLink.click();
+        await this.navbarLocators.logoutLink().click();
     }
     
 
     async register() {
-        await this.registerLink.click();
+        await this.navbarLocators.registerLink().click();
     }
 
     async goToCart() {
-        await this.cartLink.click();
+        await this.navbarLocators.cartLink().click();
     }
 
     async goToProducts() {
-        await this.productsLink.click();
+        await this.navbarLocators.productsLink().click();
     }
 
 }

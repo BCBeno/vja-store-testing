@@ -1,6 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 
-export const CART_LOCATORS = (page: Page) => ({
+export const cartLocators = (page: Page) => ({
     checkoutButton: (): Locator => page.getByTestId('checkout-btn'),
     emptyCartMessage: (): Locator => page.getByText('Your cart is empty.'),
     removeCartItemButton: (): Locator => page.getByTestId('remove-cart-item-btn'),
