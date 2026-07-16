@@ -4,6 +4,7 @@ import path from 'path';
 dotenv.config({ path: path.resolve('.env') });
 import { faker } from '@faker-js/faker';
 import { RegisterPage } from '../../pages/register/register.page';
+import { testNewUsers } from '../../test-data/newUsers';
 
 test.describe('Register', () => {
   let registerPage: RegisterPage;
@@ -25,9 +26,9 @@ test.describe('Register', () => {
       await expect(registerPage.emailInput).toBeVisible();
       await expect(registerPage.passwordInput).toBeVisible();
       await expect(registerPage.registerButton).toBeVisible();
-      name = faker.person.fullName();
-      email = faker.internet.email();
-      password = faker.internet.password();
+      name = testNewUsers.randomUser.name;
+      email = testNewUsers.randomUser.email;
+      password = testNewUsers.randomUser.password;
     });
     
     await test.step('Fill the input fields and submit', async () => {
@@ -53,9 +54,10 @@ test.describe('Register', () => {
     });
 
     await test.step('Verify validation errors', async () => {
-      await expect(registerPage.nameInput).toBeVisible();
-      await expect(registerPage.emailInput).toBeVisible();
-      await expect(registerPage.passwordInput).toBeVisible();
+      await expect(registerPage.registerEmailError).toContainText('Email is required');
+      await expect(registerPage.registerNameError).toContainText('Name is required');
+      await expect(registerPage.registerPasswordError).toContainText('Password is required');
+      
     });
   });
 
@@ -68,8 +70,8 @@ test.describe('Register', () => {
       await expect(registerPage.emailInput).toBeVisible();
       await expect(registerPage.passwordInput).toBeVisible();
       await expect(registerPage.registerButton).toBeVisible();
-      name = faker.person.fullName();
-      password = faker.internet.password();
+      name = testNewUsers.randomUser.name;
+      password = testNewUsers.randomUser.password;
     });
 
     await test.step('Fill name and password, submit without email', async () => {
@@ -81,7 +83,8 @@ test.describe('Register', () => {
     await test.step('Verify form values retained and email error shown', async () => {
       await expect(registerPage.nameInput).toHaveValue(name);
       await expect(registerPage.passwordInput).toHaveValue(password);
-      await expect(page.getByTestId('email-error')).toContainText('Email is required');
+      await expect(registerPage.registerEmailError).toBeVisible();
+      await expect(registerPage.registerEmailError).toContainText('Email is required');
     });
   });
 

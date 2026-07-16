@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { LoginPage } from '../../pages/login/login.page';
 dotenv.config({ path: path.resolve('.env') });
+import { testUsers } from '../../test-data/users';
 
 test.describe('Login', () => {
 
@@ -14,8 +15,8 @@ test.describe('Login', () => {
   });
 
   test('[C46] Login With Valid Credentials', async ({ page }) => {
-    const email = process.env.EMAIL_ACCOUNT || '';
-    const password = process.env.EMAIL_PASSWORD || '';
+    const email = testUsers.defaultUser.email;
+    const password = testUsers.defaultUser.password;
 
     await test.step('Input fields are visible', async () => {
       await expect(loginPage.emailInput).toBeVisible();

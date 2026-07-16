@@ -7,6 +7,10 @@ export class RegisterPage {
     readonly emailInput: Locator;
     readonly passwordInput: Locator;
     readonly registerButton: Locator;
+    readonly registerNameError: Locator;
+    readonly registerEmailError: Locator;
+    readonly registerPasswordError: Locator;
+
 
     constructor (page: Page){
         this.page = page;
@@ -15,6 +19,9 @@ export class RegisterPage {
         this.emailInput = locators.emailInput();
         this.passwordInput = locators.passwordInput();
         this.registerButton = locators.registerButton();
+        this.registerEmailError = locators.registerEmailError();
+        this.registerPasswordError = locators.registerPasswordError();
+        this.registerNameError = locators.registerNameError();
     }
 
     async goto(){

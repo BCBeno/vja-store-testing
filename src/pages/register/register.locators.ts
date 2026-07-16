@@ -5,4 +5,8 @@ export const REGISTER_LOCATORS = (page: Page) => ({
   emailInput: (): Locator => page.getByTestId('register-email-input'),
   passwordInput: (): Locator => page.getByTestId('register-password-input'),
   registerButton: (): Locator => page.getByTestId('register-btn'),
+  registerEmailError: (): Locator => page.getByTestId('email-error'),
+  registerPasswordError: (): Locator => page.getByTestId('password-error'),
+  registerNameError: (): Locator => page.getByTestId('name-error'),
+
 });

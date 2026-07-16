@@ -2,49 +2,64 @@ import { test, expect } from '@playwright/test';
 import dotenv from 'dotenv';
 import path from 'path';
 dotenv.config({ path: path.resolve('.env') });
+import { LoginPage } from '../../pages/login/login.page';
+import { NavBarPage } from '../../pages/navigation-bar/navBar.page';
+import { ProductPage } from '../../pages/product/product.page';
+import { CartPage } from '../../pages/catalog/cart.page';
+import { testUsers } from '../../test-data/users';
+
 
 test.describe('Core Feature Flow', () => {
+    let loginPage: LoginPage;
+    let navBarPage: NavBarPage;
+    let productPage: ProductPage;
+    let cartPage: CartPage;
+
     test.beforeEach(async ({ page }) => {
-        await page.goto('/login');
-        await page.getByTestId('login-email-input').fill(process.env.EMAIL_ACCOUNT || '');
-        await page.getByTestId('login-password-input').fill(process.env.EMAIL_PASSWORD || '');
-        await page.getByTestId('login-btn').click();
-        await page.goto('/products');
+        loginPage = new LoginPage(page);
+        navBarPage = new NavBarPage(page);
+        productPage = new ProductPage(page);
+        cartPage = new CartPage(page);
+
+        await loginPage.goto();
+        await loginPage.login(testUsers.defaultUser.email, testUsers.defaultUser.password);
+        await expect(page).toHaveURL('/products');
+        await productPage.goto();
     });
 
     test('user can complete an order successfully', async ({ page }) => {
 
         //Act
-        await page.getByTestId('product-card').first().click();
-        await page.getByTestId('add-to-cart-btn').first().click();
-        await page.getByTestId('cart-link').click();
-        await page.getByTestId('checkout-btn').click();
+        await productPage.productCard.first().click();
+        await productPage.addToCartButton.first().click();
+        await navBarPage.goToCart();
+        await cartPage.checkout();
 
         //Assert
-        await expect(page.getByTestId('order-success-message')).toBeVisible();
+        await expect(cartPage.orderPlacedSuccessMessage).toBeVisible();
 
     });
 
     test('user cannot checkout with an empty cart', async ({ page }) => {
         //Arrange
-        await page.goto('/cart');
-        let cartItemsCount = await page.getByText('· Qty').count();
-        while (cartItemsCount > 0) {
-            await page.getByTestId('remove-cart-item-btn').first().click();
-            cartItemsCount--;
-        }
+        await cartPage.goto();
+        let cartItemsCount = await cartPage.priceAndQuantityText.count();
+        await cartPage.removeAllCartItems();
+        await expect(cartItemsCount).toEqual(0);
+
 
 
         //Act
-        await page.getByTestId('checkout-btn').click();
+        await cartPage.checkout();
+
 
         //Assert
-        await expect(page.getByTestId('cart-page').locator('div').filter({ hasText: 'Your cart is empty. Add items' })).toBeVisible();
+        await expect(cartPage.emptyCartMessage).toBeVisible();
     });
 
 
     test.afterEach(async ({ page }) => {
-    await expect(page.getByTestId('logout-btn')).toBeVisible();
-    await page.getByTestId('logout-btn').click();
+    await expect(navBarPage.logoutLink).toBeVisible();
+    await navBarPage.logout();
   });
 });
