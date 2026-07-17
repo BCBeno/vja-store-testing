@@ -7,13 +7,14 @@ import { testUsers } from '../../test-data/users';
 
 test.describe('API Login E2E ', () => {
 
-  test.beforeEach(async ({ page, loginAsDefaultUserApi }) => {
-    await page.goto('/products');
+  test.beforeEach(async ({ authenticatedPage }) => {
+    await authenticatedPage.goto('/products');
   });
 
-   test('should bypass login UI and show authenticated content', async ({ page }) => {
-    await expect(page).toHaveURL('/products');
-    await expect(page.getByTestId('logout-btn')).toBeVisible();
+   test('should bypass login UI and show authenticated content', async ({ authenticatedPage }) => {
+    await expect(authenticatedPage).toHaveURL('/products');
+    await expect(authenticatedPage.getByTestId('logout-btn')).toBeVisible();
+    await expect(authenticatedPage.getByRole('link', { name: 'Favorites' })).toBeVisible();
   });
 
 

@@ -1,14 +1,12 @@
 import { test as base, Page } from '@playwright/test';
-import { LoginPage } from  '../pages/login/login.page';
+import { LoginPage } from '../pages/login/login.page';
 import { testUsers } from '../test-data/users';
 
 type AuthFixtures = {
   loginAsDefaultUser: void;
   loginAsRandomUser: void;
-  loginAsDefaultUserApi: void;
+  authenticatedPage: Page;
 };
-
-let cachedSessionCookie: any = null;
 
 
 export const test = base.extend<AuthFixtures>({
@@ -25,30 +23,37 @@ export const test = base.extend<AuthFixtures>({
     await use();
   },
 
-  loginAsDefaultUserApi: async ({ page, request }, use) => {
-    if (!cachedSessionCookie) {
-      const response = await request.post('/api/auth/login', {
-        data: {
-          email: testUsers.defaultUser.email,
-          password: testUsers.defaultUser.password,
-        },
-      });
-      if(!response.ok()) {
-        throw new Error(`Failed to login: ${response.status()} ${response.statusText()}`);
+  authenticatedPage: async ({ browser, request }, use) => {
+    const response = await request.post('/api/auth/login', {
+      data: {
+        email: testUsers.defaultUser.email,
+        password: testUsers.defaultUser.password,
       }
+    });
 
-      const {cookies} = await request.storageState();
-      const sessionCookie = cookies.find(cookie => cookie.name === 'session');
-  
-      if (!sessionCookie) {
-        throw new Error('Session cookie not found');
-      }
-  
-      cachedSessionCookie = sessionCookie;
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to login via API: ${response.status()} ${response.statusText()}`
+      );
     }
-    await page.context().addCookies([cachedSessionCookie]);
-    await use();
-    },
+
+    const storageState = await request.storageState();
+    const sessionCookie = storageState.cookies.find(cookie => cookie.name === 'session');
+
+    if (!sessionCookie) {
+      throw new Error('API login succeeded, but no session cookie was returned');
+    }
+
+    const context = await browser.newContext();
+    try {
+      await context.addCookies([sessionCookie]);
+      const page = await context.newPage();
+      await use(page);
+    } finally {
+      await context.close();
+    }
+
+  },
 
 });
 
