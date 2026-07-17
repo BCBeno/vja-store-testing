@@ -5,15 +5,31 @@ import { LoginPage } from '../../pages/login/login.page';
 dotenv.config({ path: path.resolve('.env') });
 import { testUsers } from '../../test-data/users';
 
+test.describe('API Login E2E ', () => {
+
+  test.beforeEach(async ({ page, loginAsDefaultUserApi }) => {
+    await page.goto('/products');
+  });
+
+   test('should bypass login UI and show authenticated content', async ({ page }) => {
+    await expect(page).toHaveURL('/products');
+    await expect(page.getByTestId('logout-btn')).toBeVisible();
+  });
+
+
+});
+
+
 test.describe('Login', () => {
 
   let loginPage: LoginPage;
 
-  test.beforeEach(async ({ page, loginAsDefaultUser }) => {
+  test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
+    await loginPage.goto();
   });
 
-  test('[C46] Login With Valid Credentials', async ({ page }) => {
+  test('[C46] Login With Valid Credentials', async ({ page, loginAsDefaultUser }) => {
     const email = testUsers.defaultUser.email;
     const password = testUsers.defaultUser.password;
 
