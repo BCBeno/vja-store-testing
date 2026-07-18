@@ -50,9 +50,7 @@ test.describe('Cart', () => {
     await expect(productPage.productLocators.addToCartButton().nth(2)).toBeVisible();
 
     //Act
-    await productPage.productLocators.addToCartButton().first().click();
-    await productPage.productLocators.addToCartButton().nth(1).click();
-    await productPage.productLocators.addToCartButton().nth(2).click();
+    await productPage.add3ProductsToCart();
     await cartPage.goto();
     const lineTexts = await cartPage.cartLocators.priceAndQuantityText().allTextContents();
 
@@ -63,8 +61,7 @@ test.describe('Cart', () => {
         return sum + price * qty;
     }, 0);
 
-    const subtotalText = await cartPage.cartLocators.subtotalText().textContent();
-    const subtotal = parseFloat((subtotalText || '').replace('Subtotal$', ''));
+    const subtotal = await cartPage.getSubtotal();
 
     //Assert
     expect(subtotal).toEqual(expectedSubtotal);
@@ -73,10 +70,9 @@ test.describe('Cart', () => {
 
   test('[C57] Checkout With a Non-Empty Cart', async ({ page }) => {
     await test.step('Add item to cart and proceed to checkout', async () => {
-      await productPage.productLocators.productCard().first().click();
-      await productPage.productLocators.addToCartButton().first().click();
-      await navBarPage.navbarLocators.cartLink().click();
-      await cartPage.cartLocators.checkoutButton().click();
+      await productPage.addFirstProductToCart();
+      await cartPage.goto();
+      await cartPage.checkout();
     });
 
     await test.step('Verify order was placed', async () => {
@@ -93,7 +89,7 @@ test.describe('Cart', () => {
     
     await test.step('Logout', async () => {
       await expect(navBarPage.navbarLocators.logoutLink()).toBeVisible();
-      await navBarPage.navbarLocators.logoutLink().click();
+      await navBarPage.logout();
     });
   });
   

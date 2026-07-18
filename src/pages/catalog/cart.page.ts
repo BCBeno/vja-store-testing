@@ -24,11 +24,13 @@ export class CartPage {
     }
 
     async removeAllCartItems() {
-        let cartItemsCount = await this.cartLocators.removeCartItemButton().count();
-        while (cartItemsCount > 0) {
-            await this.cartLocators.removeCartItemButton().first().click();
-            cartItemsCount--;
-        }
+        while (await this.cartLocators.removeCartItemButton().count() > 0) {
+            await this.cartLocators.removeCartItemButton().first().click();        }
+    }
+
+    async getSubtotal() {
+        const subtotalText = await this.cartLocators.subtotalText().textContent();
+        return parseFloat((subtotalText || '').replace('Subtotal$', ''));
     }
 
 }

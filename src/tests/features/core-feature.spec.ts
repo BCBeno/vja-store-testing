@@ -34,10 +34,9 @@ test.describe('Core Feature Flow', () => {
     test('user can complete an order successfully', async ({ page }) => {
 
         //Act
-        await productPage.productLocators.productCard().first().click();
-        await productPage.productLocators.addToCartButton().first().click();
-        await navBarPage.navbarLocators.cartLink().click();
-        await cartPage.cartLocators.checkoutButton().click();
+        await productPage.addFirstProductToCart();
+        await cartPage.goto();
+        await cartPage.checkout();
 
         //Assert
         await expect(cartPage.cartLocators.orderPlacedSuccessMessage()).toBeVisible();

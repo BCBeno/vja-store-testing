@@ -7,5 +7,5 @@ export const cartLocators = (page: Page) => ({
     priceAndQuantityText: (): Locator => page.getByText('· Qty'),
     subtotalText: (): Locator => page.getByText('Subtotal$'),
     orderPlacedSuccessMessage: (): Locator => page.getByTestId('order-success-message'),
-    cartIsEmpty: (): Locator => page.getByTestId('cart-page').locator('div').filter({ hasText: 'Your cart is empty. Add items' })
+    cartIsEmpty: (): Locator => page.getByText('Your cart is empty.'),
 });

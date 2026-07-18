@@ -23,17 +23,15 @@ test.describe('Filtering flow', () => {
         let firstPrice: number;
         
         await test.step('Get initial price', async () => {
-            const firstPriceText = await productPage.productLocators.productPrice(1).nth(0).textContent();
-            firstPrice = parseFloat((firstPriceText || '').replace('$', ''));
+            firstPrice = await productPage.getProductPriceByIndex(0);
         });
         
         await test.step('Select ascending sort option', async () => {
-            await productPage.productLocators.sortSelect().selectOption('price-asc');
+            await productPage.applySortOption('price-asc');
         });
         
         await test.step('Verify new price is less than or equal to first price', async () => {
-            const newPriceText = await productPage.productLocators.productPrice(1).nth(0).textContent();
-            const newPrice = parseFloat((newPriceText || '').replace('$', ''));
+            const newPrice = await productPage.getProductPriceByIndex(0);
             expect(newPrice).toBeLessThanOrEqual(firstPrice);
         });
     });
@@ -42,17 +40,15 @@ test.describe('Filtering flow', () => {
         let firstPrice: number;
         
         await test.step('Get initial price', async () => {
-            const firstPriceText = await productPage.productLocators.productPrice(0).textContent();
-            firstPrice = parseFloat((firstPriceText || '').replace('$', ''));
+            firstPrice = await productPage.getProductPriceByIndex(0);
         });
         
         await test.step('Select descending sort option', async () => {
-            await productPage.productLocators.sortSelect().selectOption('price-desc');
+            await productPage.applySortOption('price-desc');
         });
         
         await test.step('Verify new price is greater than or equal to first price', async () => {
-            const newPriceText = await productPage.productLocators.productPrice(0).textContent();
-            const newPrice = parseFloat((newPriceText || '').replace('$', ''));
+            const newPrice = await productPage.getProductPriceByIndex(0);
             expect(newPrice).toBeGreaterThanOrEqual(firstPrice);
         });
     });
@@ -62,15 +58,13 @@ test.describe('Filtering flow', () => {
         let firstPrice: number;
         
         await test.step('Get initial price', async () => {
-            const firstPriceText = await productPage.productLocators.productPrice(0).textContent();
-            firstPrice = parseFloat((firstPriceText || '').replace('$', ''));
+            firstPrice = await productPage.getProductPriceByIndex(0);
         });
 
         await test.step('Apply filters and verify them', async () => {
-            await productPage.productLocators.filterCheckbox('Adidas').click();
-            await productPage.productLocators.sortSelect().selectOption('price-asc');
-            const newPriceText = await productPage.productLocators.productPrice(0).textContent();
-            const newPrice = parseFloat((newPriceText || '').replace('$', ''));
+            await productPage.applyFilter('Adidas');
+            await productPage.applySortOption('price-asc');
+            const newPrice = await productPage.getProductPriceByIndex(0);
             await expect(newPrice).toBeLessThanOrEqual(firstPrice);
             await expect( productPage.productLocators.filterCheckbox('Adidas') ).toBeChecked();
             await expect(productPage.productLocators.sortSelect()).toHaveValue('price-asc');

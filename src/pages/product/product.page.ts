@@ -15,5 +15,30 @@ export class ProductPage {
     async goto() {
         await this.page.goto('/products');
     }
-    
+
+    async addFirstProductToCart() {
+        await this.productLocators.productCard().first().click();
+        await this.productLocators.addToCartButton().first().click();
+    }
+
+    async add3ProductsToCart() {
+        await this.productLocators.addToCartButton().first().click();
+        await this.productLocators.addToCartButton().nth(1).click();
+        await this.productLocators.addToCartButton().nth(2).click();
+    }
+
+    async applyFilter(filterName: string) {
+        await this.productLocators.filterCheckbox(filterName).click();
+    }
+
+    async applySortOption(sortOption: string) {
+        await this.productLocators.sortSelect().selectOption(sortOption);
+    }
+
+    async getProductPriceByIndex(index: number){
+        const priceText = await this.productLocators.productPrice(index).textContent();
+        return parseFloat((priceText || '').replace('$', ''));
+    }
+
+
 }
